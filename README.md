@@ -106,13 +106,13 @@ why we came up with backpack.
     ./bin/backpack /var/backpack 127.0.0.1 8080 127.0.0.1 6379
     ```
 
-Now you may try to upload file to your storage:
+Now try to upload a file to the storage:
 
 ```
 ./bin/backpack-upload 127.0.0.1 8080 /etc/hosts my/hosts
 ```
 
-And download file you just uploaded:
+And download the file you just uploaded:
 
 ```
 wget http://127.0.0.1:8080/my/hosts
@@ -120,48 +120,48 @@ wget http://127.0.0.1:8080/my/hosts
 
 ## API
 
-Api is very straightforward:
+The API is very straightforward:
 
-* PUT request to save file at specified url (query string is taken into account).
+* Make a PUT request to save a file at specified location (the query string is taken into account).
 
-* GET request to retrieve saved file.
+* Make a GET request to retrieve a saved file.
 
-* GET /stats to get some stats about what is happening.
+* GET /stats to see some stats about what is happening.
 
 ## Stats
 
-You may ask backpack for stats by hitting `/stats` url.
+You may ask Backpack for stats by hitting the `/stats` url.
 
-This is what you'll get (real example from production server at Topface):
+This is what you'll see (a real example from a production server at Topface):
 
 ```javascript
 {
     "gets": {
-        "count" : 273852, // count of GET requests
-        "bytes" : 66603359793, // total size of responses in bytes
-        "avg"   : 17.317889781518243 // average response time in ms for latest 1000 GET requests
+        "count" : 273852, // the total number of GET requests
+        "bytes" : 66603359793, // the total size of responses in bytes
+        "avg"   : 17.317889781518243 // the average response time in ms for the last 1000 GET requests
     },
     "puts":{
-        "count" : 5604, // count of PUT requests
-        "bytes" : 1616002993, // size of written data in bytes
-        "avg"   : 4.842664467849093 // average response time in ms for latest 1000 PUT requests
+        "count" : 5604, // the total  of PUT requests
+        "bytes" : 1616002993, // the size of written data in bytes
+        "avg"   : 4.842664467849093 // the average response time in ms for last 1000 PUT requests
     }
 }
 ```
 
 ## Utilities
 
-* `./bin/backpack-add` - Add data files to storage to extend capacity.
+* `./bin/backpack-add` - Add data files to the storage to extend capacity.
 
-* `./bin/backpack-upload` - Upload file to storage.
+* `./bin/backpack-upload` - Upload a file to the storage.
 
-* `./bin/backpack-dump-log` - Dump files with lengths and offsets of specified storage file.
+* `./bin/backpack-dump-log` - Dump lengths and offsets of a specified storage file.
 
 * `./bin/backpack-list` - List data files with their sizes and read-only flags.
 
-* `./bin/backpack-get-file-info` - Get data file number, offset and length by file name.
+* `./bin/backpack-get-file-info` - Get data file number, offset and length by the file name.
 
-* `./bin/backpack-restore-from-log` - Restore redis index from data file log.
+* `./bin/backpack-restore-from-log` - Restore the Redis index from the data file log.
 
 ## Authors
 
