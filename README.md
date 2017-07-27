@@ -1,33 +1,32 @@
 # backpack
 
 Ultimately fast storage for billions of files with http interface.
-This is not a database, this is an append-only mostly-reads storage.
-This is a good photo storage if you want to build your own facebook, imgur or tumblr.
+
+Backpack not a database, it's an append-only mostly-reads storage. It's a good photo storage if you want to build your own Facebook, Imgur or Tumblr.
 
 ## How it works
 
-This project is inspired by Haystack from Facebook that is not currently an open-source project.
-You may read whitepaper about their implementation and some history in this document:
-[Finding a needle in Haystack: Facebook’s photo storage](http://static.usenix.org/event/osdi10/tech/full_papers/Beaver.pdf)
+This project is inspired by Haystack from Facebook, which is not currently open-source.
+There's a whitepaper about Haystack: [Finding a needle in Haystack: Facebook’s photo storage](http://static.usenix.org/event/osdi10/tech/full_papers/Beaver.pdf)
 
-When you need to save billions of small files on fs and access them fast, you will need
+When you need to save billions of small files on the filesystem and access them fast, you will need
 to make many seeks on physical disk to get files. If you don't care about permissions
 for files and other metadata you'll have a huge overhead.
 
-Backpack stores all metadata in memory and only need one read per file. It groups small
-files into big ones and always keeps them open to return data much faster than usual fs.
+Backpack stores all metadata in memory and only needs one read per file. It groups small
+files into big ones and always keeps them open to return data much faster than a usual filesystem.
 You also get much better space utilisation for free, because there's no need to store
 useless metadata. Note that backpack does not overwrite files, it's not a replacement
-for file system. Store only data that won't change if you don't want to waste disk space.
+for a file system. Store only data that won't change if you don't want to waste disk space.
 
-Backpack also have metadata for every data file so you can restore your data if
-redis failed and lost some parts of data. However, disks can fail so we recommend
+Backpack also has metadata for every data file so you can restore your data if
+redis fails and loses some parts of data. However, disks can fail so we recommend
 to save every piece of you data on different machines or even in different data centers.
 
 ## Production usage
 
-We use it in [Topface](http://topface.com/) as photo storage for more than 100 million photos.
-Backpack instances managed by [coordinators](https://github.com/Topface/backpack-coordinator)
+We use it in [Topface](http://topface.com/) as storage for more than 100 million photos.
+Backpack instances are managed by [Coordinators](https://github.com/Topface/backpack-coordinator)
 and organized into shards to provide high availability and better performance.
 
 ## Benchmarks
@@ -70,7 +69,7 @@ Nginx needs to open directories and fetch file metadata that isn't in cache.
 Note that you can't cache everything you need if you store more data
 that in this test. Real servers hold way more data.
 
-Backpack only read the data and does not seek too much.
+Backpack only reads the data and does not seek too much.
 
 * Disk io utilization (from `iostat -x -d 10`).
 
@@ -78,35 +77,35 @@ Both disks are used by 100% while reads are active.
 
 ![disk io utilization](http://i.imgur.com/aePjesO.png)
 
-Now imagine that you have not 1 750 000 files, but 22 000 000 files on single server.
+Now imagine that you have not 1 750 000 files, but 22 000 000 files on a single server.
 Extra seek for no reason will choke your system under load. That is the main reason
 why we came up with backpack.
 
 ## Dependencies
 
-* [redis](htt://redis.io/) - redis to save meta information about stored files
+* [Redis](http://redis.io/) — saves metadata about stored files
 
-## Running server
+## Running the server
 
-1. Install and run redis server. Let's assume that it's bound to `127.0.0.1:6379`
+1. Install and run a Redis server. In this example, Redis listens on `127.0.0.1:6379`.
 
-2. Decide where you want to save your files. Let's assume that you want to store files in `/var/backpack`.
+2. Decide where you want to save the files. Let's assume you want to store the files in `/var/backpack`.
 
-3. Add some storage capacity to your backpack:
+3. Add some storage capacity to your Backpack:
 
     ```
-    # each run of this command will add you
+    # each run of this command will add
     # approximately 3.5Gb of storage capacity
     ./bin/backpack-add /var/backpack 127.0.0.1 6379
     ```
 
-4. Run you server. Let's assume that you want to listen for `127.0.0.1:8080`
+4. Run the Backpack server. Let's say you want it to listen on `127.0.0.1:8080`:
 
     ```
     ./bin/backpack /var/backpack 127.0.0.1 8080 127.0.0.1 6379
     ```
 
-Now try to upload a file to the storage:
+Now try uploading a file to the storage:
 
 ```
 ./bin/backpack-upload 127.0.0.1 8080 /etc/hosts my/hosts
@@ -120,19 +119,13 @@ wget http://127.0.0.1:8080/my/hosts
 
 ## API
 
-The API is very straightforward:
-
 * Make a PUT request to save a file at specified location (the query string is taken into account).
-
 * Make a GET request to retrieve a saved file.
-
 * GET /stats to see some stats about what is happening.
 
 ## Stats
 
-You may ask Backpack for stats by hitting the `/stats` url.
-
-This is what you'll see (a real example from a production server at Topface):
+You may ask Backpack for stats by hitting the `/stats` url. The response is like this:
 
 ```javascript
 {
